@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wishlist</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- FX overlay (videogame vibe) -->
+  <div class="fx fx-scanlines" aria-hidden="true"></div>
+  <div class="fx fx-noise" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="container header__inner">
+      <div class="brand">
+        <div class="logo-mark" aria-hidden="true">W</div>
+        <div class="brand-text">
+          <div class="brand-title">Wishlist</div>
+          <div class="brand-subtitle">Funko • Manga • Figure • WCF • Videogiochi • Preorder</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <input id="searchInput" class="search" type="search" placeholder="Cerca (nome o numero)..." />
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero__title">Sempre Gradito qualora qualcuno mi volesse così bene:</div>
+      <div class="hero__image">
+        <img src="assets/home/sempre-gradito.jpeg" alt="Sempre Gradito" />
+      </div>
+    </section>
+
+    <!-- SEZIONI (scrollabili su mobile) -->
+    <nav class="tabs" role="tablist" aria-label="Sezioni">
+      <button class="tab is-active" role="tab" aria-selected="true" data-view="Funko">Funko</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="Manga">Manga</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="Figure">Figure</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="WCF">WCF</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="Videogiochi">Videogiochi</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="Preorder">Preorder</button>
+    </nav>
+
+    <!-- TOOLBAR DINAMICA -->
+    <section class="toolbar" id="toolbar"></section>
+
+    <!-- CONTENUTO -->
+    <section id="content" class="content" aria-live="polite"></section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span>© <span id="year"></span> Wishlist</span>
+      <span class="muted">Solo catalogazione (no prezzi)</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
