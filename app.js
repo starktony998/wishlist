@@ -1,39 +1,19 @@
 // ======================
-// DATI (MODIFICA TU)
-// Catalogo: categorie -> rarità emoji -> lista items
-// Preorder: categorie -> lista items (senza rarità)
-// Ogni item: { name, number, note? }
+// AUTO-SLOT (NO CARTELLE)
+// - Genera fino a 50 immagini per ogni bucket:
+//   Catalogo: Categoria + Colore
+//   Preorder: Categoria
+// - Mostra SOLO se trova un file nella root
+// - Click foto => lightbox (ingrandita)
 // ======================
 
-const catalog = {
-  Funko:       { "🟥": [], "🟧": [], "🟨": [], "🟩": [], "◽": [] },
-  Manga:       { "🟥": [], "🟧": [], "🟨": [], "🟩": [], "◽": [] },
-  Figure:      { "🟥": [], "🟧": [], "🟨": [], "🟩": [], "◽": [] },
-  WCF:         { "🟥": [], "🟧": [], "🟨": [], "🟩": [], "◽": [] },
-  Videogiochi: { "🟥": [], "🟧": [], "🟨": [], "🟩": [], "◽": [] }
-};
+const MAX_PER_BUCKET = 50;
 
-const preorder = {
-  Funko: [],
-  Manga: [],
-  Figure: [],
-  WCF: [],
-  Videogiochi: []
-};
-
-// --- ESEMPI (puoi cancellarli)
-catalog.Funko["🟥"].push({ name: "Esempio Funko", number: "92", note: "" });
-catalog.Videogiochi["🟨"].push({ name: "Esempio Videogioco", number: "10", note: "Switch/PS5 ecc." });
-preorder.Manga.push({ name: "Esempio Preorder Manga", number: "999", note: "In arrivo" });
-
-// ======================
-// CONFIG
-// ======================
-const RARITIES = ["🟥","🟧","🟨","🟩","◽"];
 const CATALOG_CATS = ["Funko","Manga","Figure","WCF","Videogiochi"];
+const PREORDER_CATS = ["Funko","Manga","Figure","WCF","Videogiochi"];
 
-// MAPPATURA emoji -> nome cartella
-const RARITY_FOLDER = {
+const RARITIES = ["🟥","🟧","🟨","🟩","◽"];
+const RARITY_NAME = {
   "🟥": "Rosso",
   "🟧": "Arancione",
   "🟨": "Giallo",
@@ -41,17 +21,19 @@ const RARITY_FOLDER = {
   "◽": "Bianco"
 };
 
-let currentView = "Funko";       // una categoria catalogo o "Preorder"
-let currentRarity = "🟥";        // solo catalogo
-let currentPreCat = "Funko";     // solo preorder
+let currentView = "Funko";   // Catalog cat or "Preorder"
+let currentRarity = "🟥";    // only for catalog
+let currentPreCat = "Funko"; // only for preorder
 let query = "";
 
-// ======================
-// HELPERS
-// ======================
+// DOM
 const $ = (sel) => document.querySelector(sel);
 
-function normalize(s){ return String(s || "").toLowerCase().trim(); }
+// Lightbox DOM
+const lightbox = $("#lightbox");
+const lightboxImg = $("#lightboxImg");
+const lightboxCaption = $("#lightboxCaption");
+
 function escapeHTML(str){
   return String(str)
     .replaceAll("&", "&amp;")
@@ -60,79 +42,103 @@ function escapeHTML(str){
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-function escapeAttr(str){ return escapeHTML(str); }
+function normalize(s){ return String(s || "").toLowerCase().trim(); }
 
-function matchesSearch(item){
-  if(!query) return true;
-  const q = normalize(query);
-  return normalize(item.name).includes(q) || normalize(item.number).includes(q) || normalize(item.note).includes(q);
-}
-
-// Percorsi immagini: prova varie estensioni
-function buildImageCandidatesForCatalog(category, rarityEmoji, number){
-  const colorFolder = RARITY_FOLDER[rarityEmoji] || "Bianco";
-  const base = `assets/catalog/${category}/${colorFolder}/${number}`;
-  return [`${base}.jpeg`, `${base}.jpg`, `${base}.png`, `${base}.webp`];
-}
-function buildImageCandidatesForPreorder(preCat, number){
-  const base = `assets/preorder/${preCat}/${number}`;
+// Candidate extensions
+function candidates(base){
   return [`${base}.jpeg`, `${base}.jpg`, `${base}.png`, `${base}.webp`];
 }
 
-function imageTag(candidates, alt){
+// Base file names in ROOT (no folders)
+function baseNameForCatalog(category, rarityEmoji, index){
+  // es: FunkoRosso1
+  const color = RARITY_NAME[rarityEmoji] || "Bianco";
+  return `${category}${color}${index}`;
+}
+function baseNameForPreorder(category, index){
+  // es: PreorderFunko1
+  return `Preorder${category}${index}`;
+}
+
+// Build <img> with fallback
+function imgHTML(cands, alt, caption){
   return `
     <img
-      src="${escapeAttr(candidates[0])}"
-      data-fallback="${escapeAttr(candidates.slice(1).join("|"))}"
-      alt="${escapeAttr(alt)}"
+      class="slot-img"
+      src="${escapeHTML(cands[0])}"
+      data-fallback="${escapeHTML(cands.slice(1).join("|"))}"
+      data-caption="${escapeHTML(caption)}"
+      alt="${escapeHTML(alt)}"
       loading="lazy"
     >
   `;
 }
 
-function enableImageFallback(){
+// Wire fallback + remove card if nothing found
+function wireImageFallbackAndZoom(){
+  // fallback + remove card
   document.querySelectorAll("img[data-fallback]").forEach(img => {
     img.onerror = () => {
       const raw = img.getAttribute("data-fallback") || "";
       const list = raw.split("|").filter(Boolean);
-      if(list.length === 0) return;
+
+      if(list.length === 0){
+        const card = img.closest(".card");
+        if(card) card.remove();
+        return;
+      }
+
       img.src = list[0];
       const rest = list.slice(1);
       if(rest.length > 0) img.setAttribute("data-fallback", rest.join("|"));
       else img.removeAttribute("data-fallback");
     };
   });
+
+  // click => lightbox (event delegation)
+  const content = $("#content");
+  content.onclick = (e) => {
+    const img = e.target.closest("img.slot-img");
+    if(!img) return;
+    openLightbox(img.currentSrc || img.src, img.getAttribute("data-caption") || "");
+  };
 }
 
-function cardHTML({ name, number, note }, imgCandidates){
-  const noteHTML = note ? `<div class="note">${escapeHTML(note)}</div>` : "";
+// Search
+function matchesSearch(text){
+  if(!query) return true;
+  const q = normalize(query);
+  return normalize(text).includes(q);
+}
+
+// Card
+function card(slotTitle, slotNumberText, imgCandidates){
+  const caption = `${slotTitle} • ${slotNumberText}`;
   return `
     <article class="card">
-      <div class="thumb">
-        ${imageTag(imgCandidates, name)}
+      <div class="thumb" title="Clicca per ingrandire">
+        ${imgHTML(imgCandidates, slotTitle, caption)}
       </div>
       <div class="meta">
         <div class="title-row">
-          <div class="name" title="${escapeAttr(name)}">${escapeHTML(name)}</div>
-          <div class="number">${number ? `# ${escapeHTML(number)}` : ""}</div>
+          <div class="name" title="${escapeHTML(slotTitle)}">${escapeHTML(slotTitle)}</div>
+          <div class="number">${escapeHTML(slotNumberText)}</div>
         </div>
-        ${noteHTML}
+        <div class="note">Click sulla foto per zoom</div>
       </div>
     </article>
   `;
 }
 
-// ======================
-// TOOLBAR
-// ======================
+// Toolbar
 function renderToolbar(){
   const toolbar = $("#toolbar");
 
   if(currentView === "Preorder"){
     toolbar.innerHTML = `
       <div class="pills" role="list">
-        ${CATALOG_CATS.map(c => `
-          <button class="pill ${c===currentPreCat ? "is-active" : ""}" data-precat="${escapeAttr(c)}" role="listitem">
+        ${PREORDER_CATS.map(c => `
+          <button class="pill ${c===currentPreCat ? "is-active" : ""}" data-precat="${escapeHTML(c)}" role="listitem">
             ${escapeHTML(c)}
           </button>
         `).join("")}
@@ -154,7 +160,7 @@ function renderToolbar(){
   toolbar.innerHTML = `
     <div class="pills" role="list">
       ${RARITIES.map(r => `
-        <button class="pill ${r===currentRarity ? "is-active" : ""}" data-rarity="${escapeAttr(r)}" role="listitem">
+        <button class="pill ${r===currentRarity ? "is-active" : ""}" data-rarity="${escapeHTML(r)}" role="listitem">
           ${escapeHTML(r)}
         </button>
       `).join("")}
@@ -171,57 +177,57 @@ function renderToolbar(){
   });
 }
 
-// ======================
-// CONTENUTO
-// ======================
 function renderContent(){
   const content = $("#content");
   const stats = $("#stats");
 
+  let html = "";
+
   if(currentView === "Preorder"){
-    const list = (preorder[currentPreCat] || []).filter(matchesSearch);
+    for(let i=1; i<=MAX_PER_BUCKET; i++){
+      const base = baseNameForPreorder(currentPreCat, i);
+      const cands = candidates(base);
+
+      const slotTitle = `Preorder ${currentPreCat}`;
+      const slotNumber = `#${i}`;
+
+      if(matchesSearch(`${slotTitle} ${slotNumber}`)){
+        html += card(`${slotTitle}`, slotNumber, cands);
+      }
+    }
+
+    content.innerHTML = html || `<div class="empty">Carica immagini tipo <b>Preorder${escapeHTML(currentPreCat)}1.jpeg</b> nella stessa cartella di index.html</div>`;
+    wireImageFallbackAndZoom();
 
     if(stats){
-      stats.textContent = `Preorder • ${currentPreCat} • ${list.length} risultati` + (query ? ` • filtro: "${query}"` : "");
+      stats.textContent = `Preorder • ${currentPreCat} • slot 1-${MAX_PER_BUCKET}` + (query ? ` • filtro: "${query}"` : "");
     }
-
-    if(list.length === 0){
-      content.innerHTML = `<div class="empty">Nessun preorder in <b>${escapeHTML(currentPreCat)}</b>.</div>`;
-      return;
-    }
-
-    content.innerHTML = list.map(item => {
-      const candidates = buildImageCandidatesForPreorder(currentPreCat, item.number);
-      return cardHTML(item, candidates);
-    }).join("");
-
-    enableImageFallback();
     return;
   }
 
-  const list = (catalog[currentView]?.[currentRarity] || []).filter(matchesSearch);
+  // Catalogo
+  const colorName = RARITY_NAME[currentRarity] || "Bianco";
+  for(let i=1; i<=MAX_PER_BUCKET; i++){
+    const base = baseNameForCatalog(currentView, currentRarity, i);
+    const cands = candidates(base);
+
+    const slotTitle = `${currentView} ${colorName}`;
+    const slotNumber = `#${i}`;
+
+    if(matchesSearch(`${slotTitle} ${slotNumber}`)){
+      html += card(slotTitle, slotNumber, cands);
+    }
+  }
+
+  content.innerHTML = html || `<div class="empty">Carica immagini tipo <b>${escapeHTML(currentView)}${escapeHTML(colorName)}1.jpeg</b> nella stessa cartella di index.html</div>`;
+  wireImageFallbackAndZoom();
 
   if(stats){
-    const folder = RARITY_FOLDER[currentRarity] || "";
-    stats.textContent = `${currentView} • ${currentRarity} (${folder}) • ${list.length} risultati` + (query ? ` • filtro: "${query}"` : "");
+    stats.textContent = `${currentView} • ${currentRarity} (${colorName}) • slot 1-${MAX_PER_BUCKET}` + (query ? ` • filtro: "${query}"` : "");
   }
-
-  if(list.length === 0){
-    content.innerHTML = `<div class="empty">Nessun elemento in <b>${escapeHTML(currentView)}</b> ${escapeHTML(currentRarity)}.</div>`;
-    return;
-  }
-
-  content.innerHTML = list.map(item => {
-    const candidates = buildImageCandidatesForCatalog(currentView, currentRarity, item.number);
-    return cardHTML(item, candidates);
-  }).join("");
-
-  enableImageFallback();
 }
 
-// ======================
-// NAV TABS
-// ======================
+// Tabs
 function setActiveTab(view){
   currentView = view;
   if(view !== "Preorder") currentRarity = "🟥";
@@ -236,9 +242,34 @@ function setActiveTab(view){
   renderContent();
 }
 
-// ======================
-// INIT
-// ======================
+// Lightbox controls
+function openLightbox(src, caption){
+  lightbox.classList.add("is-open");
+  lightbox.setAttribute("aria-hidden", "false");
+  lightboxImg.src = src;
+  lightboxImg.alt = caption || "Anteprima";
+  lightboxCaption.textContent = caption || "";
+  document.body.style.overflow = "hidden";
+}
+function closeLightbox(){
+  lightbox.classList.remove("is-open");
+  lightbox.setAttribute("aria-hidden", "true");
+  lightboxImg.src = "";
+  lightboxCaption.textContent = "";
+  document.body.style.overflow = "";
+}
+
+// Close on click backdrop / X
+lightbox.addEventListener("click", (e) => {
+  if(e.target && e.target.getAttribute("data-close") === "1") closeLightbox();
+});
+
+// Close on ESC
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+});
+
+// Init
 function init(){
   $("#year").textContent = new Date().getFullYear();
 
