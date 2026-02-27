@@ -8,7 +8,6 @@
 </head>
 
 <body>
-  <!-- FX overlay (videogame vibe) -->
   <div class="fx fx-scanlines" aria-hidden="true"></div>
   <div class="fx fx-noise" aria-hidden="true"></div>
 
@@ -23,21 +22,20 @@
       </div>
 
       <div class="header-actions">
-        <input id="searchInput" class="search" type="search" placeholder="Cerca (nome o numero)..." />
+        <input id="searchInput" class="search" type="search" placeholder="Cerca (es: rosso 1, preorder 3)..." />
       </div>
     </div>
   </header>
 
   <main class="container main">
-    <!-- HERO -->
     <section class="hero">
       <div class="hero__title">Sempre Gradito qualora qualcuno mi volesse così bene:</div>
       <div class="hero__image">
-        <img src="sempre-gradito.jpeg" alt="Sempre Gradito" />
+        <!-- Metti la tua immagine in root come hero.jpeg -->
+        <img src="hero.jpeg" alt="Sempre Gradito" />
       </div>
     </section>
 
-    <!-- SEZIONI (scrollabili su mobile) -->
     <nav class="tabs" role="tablist" aria-label="Sezioni">
       <button class="tab is-active" role="tab" aria-selected="true" data-view="Funko">Funko</button>
       <button class="tab" role="tab" aria-selected="false" data-view="Manga">Manga</button>
@@ -47,19 +45,27 @@
       <button class="tab" role="tab" aria-selected="false" data-view="Preorder">Preorder</button>
     </nav>
 
-    <!-- TOOLBAR DINAMICA -->
     <section class="toolbar" id="toolbar"></section>
-
-    <!-- CONTENUTO -->
     <section id="content" class="content" aria-live="polite"></section>
   </main>
 
   <footer class="footer">
     <div class="container footer__inner">
       <span>© <span id="year"></span> Wishlist</span>
-      <span class="muted">Solo catalogazione (no prezzi)</span>
+      <span class="muted">Clicca una foto per ingrandirla</span>
     </div>
   </footer>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <div class="lightbox__backdrop" data-close="1"></div>
+
+    <div class="lightbox__panel" role="dialog" aria-modal="true" aria-label="Anteprima immagine">
+      <button class="lightbox__close" type="button" aria-label="Chiudi" data-close="1">✕</button>
+      <img id="lightboxImg" class="lightbox__img" alt="" />
+      <div id="lightboxCaption" class="lightbox__caption"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
