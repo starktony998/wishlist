@@ -2,38 +2,39 @@
 <html lang="it">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wishlist</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishlist</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-  <h1 class="logo">WISHLIST</h1>
+  <header>
+    <h1 class="logo">WISHLIST</h1>
+    <div class="menu">
+      <button onclick="openCategory('Funko')">Funko</button>
+      <button onclick="openCategory('Manga')">Manga</button>
+      <button onclick="openCategory('Figure')">Figure</button>
+      <button onclick="openCategory('Wcf')">WCF</button>
+      <button onclick="openCategory('Videogiochi')">Videogiochi</button>
+      <button onclick="openCategory('Preorder')">Preorder</button>
+    </div>
+  </header>
 
-  <div class="menu">
-    <button onclick="openCategory('Funko')">Funko</button>
-    <button onclick="openCategory('Manga')">Manga</button>
-    <button onclick="openCategory('Figure')">Figure</button>
-    <button onclick="openCategory('Wcf')">WCF</button>
-    <button onclick="openCategory('Videogiochi')">Videogiochi</button>
+  <!-- Hero image -->
+  <div class="hero__image">
+    <img src="BannerGrande.jpeg" alt="Banner Wishlist">
   </div>
-</header>
 
-<!-- Hero image nella home -->
-<div class="hero__image">
-  <img src="sempre-gradito.jpeg" alt="Banner Wishlist">
-</div>
+  <main id="content"></main>
 
-<main id="content"></main>
+  <!-- Modal immagine ingrandita -->
+  <div id="modal" onclick="closeModal()">
+    <img id="modalImg">
+  </div>
 
-<!-- Modal ingrandimento immagine -->
-<div id="modal" onclick="closeModal()">
-  <img id="modalImg">
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
+
 </html>
