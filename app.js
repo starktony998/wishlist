@@ -1,13 +1,11 @@
 const MAX_ITEMS = 75;
 
 const colors = [
-
-{ name:"Rosso",emoji:"🟥"},
-{ name:"Arancione",emoji:"🟧"},
-{ name:"Giallo",emoji:"🟨"},
-{ name:"Verde",emoji:"🟩"},
-{ name:"Bianco",emoji:"◽"}
-
+  { name: "Rosso", emoji: "🟥" },
+  { name: "Arancione", emoji: "🟧" },
+  { name: "Giallo", emoji: "🟨" },
+  { name: "Verde", emoji: "🟩" },
+  { name: "Bianco", emoji: "◽" }
 ];
 
 let currentCategory = null;
@@ -17,80 +15,68 @@ const content = document.getElementById("content");
 const modal = document.getElementById("modal");
 const modalImg = document.getElementById("modalImg");
 
-function openCategory(category){
-
-currentCategory = category;
-currentColor = "Rosso";
-
-render();
-
+// Apri una categoria (Funko, Manga, ecc.)
+function openCategory(category) {
+  currentCategory = category;
+  currentColor = "Rosso";
+  render();
 }
 
-function render(){
+// Mostra rarità e immagini
+function render() {
+  content.innerHTML = "";
 
-content.innerHTML = "";
+  // Barra rarità
+  const rarityBar = document.createElement("div");
+  rarityBar.className = "rarity";
 
-const rarityBar = document.createElement("div");
-rarityBar.className = "rarity";
+  colors.forEach(c => {
+    const btn = document.createElement("button");
+    btn.innerText = c.emoji;
 
-colors.forEach(c=>{
+    btn.onclick = () => {
+      currentColor = c.name;
+      render();
+    };
 
-const btn = document.createElement("button");
+    rarityBar.appendChild(btn);
+  });
 
-btn.innerText = c.emoji;
+  content.appendChild(rarityBar);
 
-btn.onclick = ()=>{
+  // Griglia immagini
+  const grid = document.createElement("div");
+  grid.className = "grid";
 
-currentColor = c.name;
-render();
+  for (let i = 1; i <= MAX_ITEMS; i++) {
+    const imgName = `${currentCategory}${currentColor}${i}.jpeg`;
 
-};
+    const card = document.createElement("div");
+    card.className = "card";
 
-rarityBar.appendChild(btn);
+    const img = document.createElement("img");
+    img.src = imgName;
+    img.loading = "lazy"; // 👈 lazy loading aggiunto
 
-});
+    // Se non esiste l'immagine, rimuovi la card
+    img.onerror = function () {
+      card.remove();
+    };
 
-content.appendChild(rarityBar);
+    // Clicca per ingrandire
+    img.onclick = () => {
+      modal.style.display = "flex";
+      modalImg.src = img.src;
+    };
 
-const grid = document.createElement("div");
-grid.className = "grid";
+    card.appendChild(img);
+    grid.appendChild(card);
+  }
 
-for(let i=1;i<=MAX_ITEMS;i++){
-
-const imgName = `${currentCategory}${currentColor}${i}.jpeg`;
-
-const card = document.createElement("div");
-card.className = "card";
-
-const img = document.createElement("img");
-
-img.src = imgName;
-img.loading = "lazy";
-
-img.onerror = function(){
-
-card.remove();
-
-};
-
-img.onclick = ()=>{
-
-modal.style.display = "flex";
-modalImg.src = img.src;
-
-};
-
-card.appendChild(img);
-grid.appendChild(card);
-
+  content.appendChild(grid);
 }
 
-content.appendChild(grid);
-
-}
-
-function closeModal(){
-
-modal.style.display = "none";
-
+// Chiudi il modal
+function closeModal() {
+  modal.style.display = "none";
 }
