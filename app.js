@@ -51,18 +51,32 @@ function render(){
   grid.className = "grid";
 
   for(let i=1;i<=MAX_ITEMS;i++){
-    const imgName = `${currentCategory}${currentColor}${i}.jpeg`;
+   const baseName = `${currentCategory}${currentColor}${i}`;
+const candidatesList = candidates(baseName); // tutti i formati
+let loaded = false;
 
-    const card = document.createElement("div");
-    card.className = "card";
+const card = document.createElement("div");
+card.className = "card";
 
-    const img = document.createElement("img");
-    img.src = imgName;
-    img.loading = "lazy"; // 👈 lazy loading
+const img = document.createElement("img");
+img.loading = "lazy";
 
-    // Se l'immagine non esiste
-    img.onerror = function(){ card.remove(); };
+function tryNext(){
+  if(candidatesList.length === 0){
+    card.remove(); // nessun formato trovato
+    return;
+  }
+  img.src = candidatesList.shift();
+}
 
+img.onerror = tryNext;
+tryNext(); // prova il primo formato
+
+// clic per ingrandire
+img.onclick = ()=>{ modal.style.display="flex"; modalImg.src=img.src; };
+
+card.appendChild(img);
+grid.appendChild(card);
     // Clic per ingrandire
     img.onclick = ()=>{ modal.style.display="flex"; modalImg.src=img.src; };
 
