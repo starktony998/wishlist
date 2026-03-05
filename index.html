@@ -1,74 +1,44 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wishlist</title>
-  <link rel="stylesheet" href="style.css" />
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Wishlist</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
-  <div class="fx fx-scanlines" aria-hidden="true"></div>
-  <div class="fx fx-noise" aria-hidden="true"></div>
 
-  <header class="header">
-    <div class="container header__inner">
-      <div class="brand">
-        <div class="logo-mark" aria-hidden="true">W</div>
-        <div class="brand-text">
-          <div class="brand-title">Wishlist</div>
-          <div class="brand-subtitle">Funko • Manga • Figure • WCF • Videogiochi • Preorder</div>
-        </div>
-      </div>
+<header>
 
-      <div class="header-actions">
-        <input id="searchInput" class="search" type="search" placeholder="Cerca (es: rosso 1, preorder 3)..." />
-      </div>
-    </div>
-  </header>
+<h1 class="logo">WISHLIST</h1>
 
-  <main class="container main">
-    <section class="hero">
-      <div class="hero__title">Sempre Gradito qualora qualcuno mi volesse così bene:</div>
-      <div class="hero__image">
-        <!-- Metti la tua immagine in root come hero.jpeg -->
-        <img src="sempre-gradito.jpeg" alt="sempre-gradito.jpeg" />
-      </div>
-    </section>
+<div class="menu">
 
-    <nav class="tabs" role="tablist" aria-label="Sezioni">
-      <button class="tab is-active" role="tab" aria-selected="true" data-view="Funko">Funko</button>
-      <button class="tab" role="tab" aria-selected="false" data-view="Manga">Manga</button>
-      <button class="tab" role="tab" aria-selected="false" data-view="Figure">Figure</button>
-      <button class="tab" role="tab" aria-selected="false" data-view="WCF">WCF</button>
-      <button class="tab" role="tab" aria-selected="false" data-view="Videogiochi">Videogiochi</button>
-      <button class="tab" role="tab" aria-selected="false" data-view="Preorder">Preorder</button>
-    </nav>
+<button onclick="openCategory('Funko')">Funko</button>
+<button onclick="openCategory('Manga')">Manga</button>
+<button onclick="openCategory('Figure')">Figure</button>
+<button onclick="openCategory('Wcf')">WCF</button>
+<button onclick="openCategory('Videogiochi')">Videogiochi</button>
 
-    <section class="toolbar" id="toolbar"></section>
-    <section id="content" class="content" aria-live="polite"></section>
-  </main>
+</div>
 
-  <footer class="footer">
-    <div class="container footer__inner">
-      <span>© <span id="year"></span> Wishlist</span>
-      <span class="muted">Clicca una foto per ingrandirla</span>
-    </div>
-  </footer>
+</header>
 
-  <!-- LIGHTBOX -->
-  <div id="lightbox" class="lightbox" aria-hidden="true">
-    <div class="lightbox__backdrop" data-close="1"></div>
+<main id="content"></main>
 
-    <div class="lightbox__panel" role="dialog" aria-modal="true" aria-label="Anteprima immagine">
-      <button class="lightbox__close" type="button" aria-label="Chiudi" data-close="1">✕</button>
-      <img id="lightboxImg" class="lightbox__img" alt="" />
-      <div id="lightboxCaption" class="lightbox__caption"></div>
-    </div>
-  </div>
+<div id="modal" onclick="closeModal()">
 
-  <script src="app.js"></script>
+<img id="modalImg">
+
+</div>
+
+<script src="app.js"></script>
+
 </body>
 </html>
-
-
