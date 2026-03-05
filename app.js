@@ -1,3 +1,10 @@
+// Lista delle estensioni supportate
+const extensions = ['jpeg', 'jpg', 'png', 'webp'];
+
+// Funzione che genera i candidati per l’immagine
+function candidates(base) {
+  return extensions.map(ext => `./${base}.${ext}`);
+}
 const MAX_ITEMS = 75;
 
 const colors = [
