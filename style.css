@@ -181,3 +181,25 @@ body::after {
   .menu button { padding: 8px 12px; font-size: 12px; }
   .rarity button { font-size: 26px; }
 }
+#musicToggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1001;
+  padding: 10px 15px;
+  border: 2px solid #22c55e;
+  border-radius: 12px;
+  background: #020617;
+  color: #22c55e;
+  cursor: pointer;
+  font-weight: bold;
+  text-shadow: 0 0 3px #22c55e;
+  transition: 0.3s;
+}
+
+#musicToggle:hover {
+  background: #22c55e;
+  color: black;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #22c55e, 0 0 20px #22c55e;
+}
