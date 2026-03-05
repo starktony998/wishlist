@@ -1,3 +1,16 @@
+// Musica di sottofondo
+const music = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicToggle");
+
+musicBtn.onclick = () => {
+  if (music.paused) {
+    music.play();
+    musicBtn.innerText = "🔇 Pausa Musica";
+  } else {
+    music.pause();
+    musicBtn.innerText = "🎵 Musica";
+  }
+};
 // Lista estensioni
 const extensions = ['jpeg','jpg','png','webp'];
 function candidates(base){ return extensions.map(ext=>`./${base}.${ext}`); }
