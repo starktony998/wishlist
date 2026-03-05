@@ -15,30 +15,25 @@ const content = document.getElementById("content");
 const modal = document.getElementById("modal");
 const modalImg = document.getElementById("modalImg");
 
-// Apri una categoria (Funko, Manga, ecc.)
-function openCategory(category) {
+// Apri categoria
+function openCategory(category){
   currentCategory = category;
   currentColor = "Rosso";
   render();
 }
 
 // Mostra rarità e immagini
-function render() {
+function render(){
   content.innerHTML = "";
 
   // Barra rarità
   const rarityBar = document.createElement("div");
   rarityBar.className = "rarity";
 
-  colors.forEach(c => {
+  colors.forEach(c=>{
     const btn = document.createElement("button");
     btn.innerText = c.emoji;
-
-    btn.onclick = () => {
-      currentColor = c.name;
-      render();
-    };
-
+    btn.onclick = ()=>{ currentColor = c.name; render(); };
     rarityBar.appendChild(btn);
   });
 
@@ -48,7 +43,7 @@ function render() {
   const grid = document.createElement("div");
   grid.className = "grid";
 
-  for (let i = 1; i <= MAX_ITEMS; i++) {
+  for(let i=1;i<=MAX_ITEMS;i++){
     const imgName = `${currentCategory}${currentColor}${i}.jpeg`;
 
     const card = document.createElement("div");
@@ -56,18 +51,13 @@ function render() {
 
     const img = document.createElement("img");
     img.src = imgName;
-    img.loading = "lazy"; // 👈 lazy loading aggiunto
+    img.loading = "lazy"; // 👈 lazy loading
 
-    // Se non esiste l'immagine, rimuovi la card
-    img.onerror = function () {
-      card.remove();
-    };
+    // Se l'immagine non esiste
+    img.onerror = function(){ card.remove(); };
 
-    // Clicca per ingrandire
-    img.onclick = () => {
-      modal.style.display = "flex";
-      modalImg.src = img.src;
-    };
+    // Clic per ingrandire
+    img.onclick = ()=>{ modal.style.display="flex"; modalImg.src=img.src; };
 
     card.appendChild(img);
     grid.appendChild(card);
@@ -76,7 +66,7 @@ function render() {
   content.appendChild(grid);
 }
 
-// Chiudi il modal
-function closeModal() {
+// Chiudi modal
+function closeModal(){
   modal.style.display = "none";
 }
